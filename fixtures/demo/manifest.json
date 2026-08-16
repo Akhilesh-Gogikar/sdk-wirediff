@@ -1,0 +1,31 @@
+{
+  "name": "synthetic-widget-list",
+  "baseline": "typescript",
+  "adapters": {
+    "typescript": { "observation": "observations/typescript.json" },
+    "python": { "command": ["{python}", "adapters/python_adapter.py"] },
+    "go": { "observation": "observations/go.json" }
+  },
+  "compare": {
+    "defaults": {
+      "page_size": "/request/query/page_size"
+    },
+    "errors": {
+      "code": "/error/code",
+      "status": "/error/status"
+    },
+    "retries": {
+      "attempt_count": { "path": "/attempts", "transform": "length" }
+    },
+    "pagination": {
+      "has_more": "/response/body/has_more",
+      "next_cursor": "/response/body/next_cursor"
+    },
+    "nulls": {
+      "owner": { "path": "/response/body/meta/owner", "transform": "presence" }
+    },
+    "fields": {
+      "item_fields": { "path": "/response/body/items/0", "transform": "keys" }
+    }
+  }
+}

@@ -15,3 +15,6 @@ This repository must remain independently developed from public sources and synt
 | Date | Source/version | Purpose | License or terms | Notes |
 |---|---|---|---|---|
 | 2026-08-16 | Project brief derived from public-landscape research | Initial scope only | Internal planning | No implementation or copied source |
+| 2026-08-16 | Python 3 standard library documentation | CLI, JSON/URL normalization, subprocess adapter, tests | PSF License | No runtime dependencies; no copied snippets |
+| 2026-08-16 | [RFC 6901](https://www.rfc-editor.org/rfc/rfc6901) | Probe path syntax | IETF document terms | Pointer traversal independently implemented |
+| 2026-08-16 | Locally authored synthetic SDK observations | Offline three-divergence proof gate | Internal incubation | Fictitious host and entities; no real provider or traffic data |

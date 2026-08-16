@@ -13,3 +13,11 @@ target/
 *.log
 .tmp/
 .cache/
+.codesight/
+# Generated local reports and Python caches
+demo-output/
+wirediff.json
+wirediff.html
+wirediff.repro.json
+__pycache__/
+*.pyc

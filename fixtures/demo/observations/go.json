@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://synthetic.invalid/widgets?page_size=50&include_archived=false",
+    "headers": { "accept": "application/json" }
+  },
+  "attempts": [
+    { "status": 429 },
+    { "status": 200 }
+  ],
+  "error": { "code": "rate_limited", "status": 429 },
+  "response": {
+    "status_code": "200",
+    "headers": { "content-type": "application/json" },
+    "body": {
+      "items": [{ "id": "widget-1", "label": "Alpha" }],
+      "meta": { "owner": null },
+      "next_cursor": "cursor-2",
+      "has_more": true
+    }
+  }
+}

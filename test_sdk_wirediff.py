@@ -24,6 +24,9 @@ class WireDiffTest(unittest.TestCase):
         report = sdk_wirediff.render_html(first)
         self.assertIn("3</strong><br>divergences", report)
         self.assertNotIn("<script", report.lower())
+        self.assertIn('href="#main-content"', report)
+        self.assertIn('<caption>Baseline-relative semantic differences</caption>', report)
+        self.assertIn('th scope="col"', report)
 
     def test_command_adapters_are_opt_in(self):
         with self.assertRaisesRegex(sdk_wirediff.WireDiffError, "--allow-command"):

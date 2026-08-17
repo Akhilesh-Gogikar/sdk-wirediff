@@ -21,3 +21,4 @@ wirediff.html
 wirediff.repro.json
 __pycache__/
 *.pyc
+*.egg-info/

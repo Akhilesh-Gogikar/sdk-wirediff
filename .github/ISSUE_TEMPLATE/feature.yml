@@ -1,0 +1,32 @@
+name: Feature request
+description: Propose a narrow, evidence-backed semantic comparison improvement.
+title: "feature: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Cross-SDK behavior problem
+      description: Describe the problem without production traffic or named provider claims.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Public or synthetic evidence
+      description: Provide a minimal observation envelope and the semantic distinction needed.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Smallest useful change
+    validations:
+      required: true
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This remains fixture-driven and does not require production credentials or traffic.
+          required: true

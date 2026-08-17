@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sdk-wirediff"
+version = "0.1.0"
+description = "Deterministic semantic diffs for TypeScript, Python, and Go SDK observations."
+readme = "README.md"
+requires-python = ">=3.10,<3.15"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Akhilesh Gogikar" }]
+keywords = ["sdk", "differential-testing", "http", "reproducibility"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/akigogikar/sdk-wirediff"
+Issues = "https://github.com/akigogikar/sdk-wirediff/issues"
+Source = "https://github.com/akigogikar/sdk-wirediff"
+
+[project.scripts]
+sdk-wirediff = "sdk_wirediff:cli"
+
+[tool.setuptools]
+py-modules = ["sdk_wirediff"]

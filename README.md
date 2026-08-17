@@ -1,41 +1,63 @@
 # SDK WireDiff
 
-> **Private incubation repository. Do not publish or announce yet.**
+[![CI](https://github.com/akigogikar/sdk-wirediff/actions/workflows/ci.yml/badge.svg)](https://github.com/akigogikar/sdk-wirediff/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/akigogikar/sdk-wirediff)](LICENSE)
 
-SDK WireDiff compares what TypeScript, Python, and Go SDK adapters actually put on and recover from the wire. A fixture manifest selects semantic probes for defaults, errors, retries, pagination, nullability, and field handling. The standard-library CLI normalizes captured or command-produced JSON observations and emits deterministic JSON, a static HTML report, and a self-contained minimal repro manifest.
+> **Status:** 0.1.0 launch candidate in a private repository. It is suitable for synthetic and sanitized public observations, but has not completed the owner’s public-launch review and is not published to a package registry.
 
-## Quickstart
+SDK WireDiff compares what TypeScript, Python, and Go SDK adapters put on and recover from the wire. A fixture manifest selects semantic probes for defaults, errors, retries, pagination, nullability, and field handling. The standard-library CLI normalizes captured or command-produced JSON observations and emits deterministic JSON, a static HTML report, and a self-contained minimal repro.
 
-Requires Python 3.10 or newer. There are no runtime or test dependencies, and the demo performs no network I/O.
+## Install from a local checkout
+
+Requires Python 3.10 through 3.14 (`>=3.10,<3.15`). CI tests all five versions on Linux and Python 3.14 on macOS and Windows. There are no runtime dependencies.
 
 ```sh
-python3 -m unittest -v
-python3 sdk_wirediff.py compare fixtures/demo/manifest.json --allow-command \
+git clone https://github.com/akigogikar/sdk-wirediff.git
+cd sdk-wirediff
+python3 -m pip install --no-deps .
+sdk-wirediff --help
+```
+
+Use a virtual environment for an isolated install. For a repository-only workflow, replace `sdk-wirediff` below with `python3 sdk_wirediff.py`.
+
+## One-command semantic comparison
+
+The demo is synthetic and performs no network I/O. It intentionally finds exactly three differences.
+
+```sh
+sdk-wirediff compare fixtures/demo/manifest.json --allow-command \
   --json demo-output/diff.json \
   --html demo-output/diff.html \
   --repro demo-output/repro.json
-open demo-output/diff.html
 ```
 
-`--allow-command` is required because the synthetic Python adapter is executable. The TypeScript and Go adapters are captured JSON. The demo intentionally and stably finds exactly three divergences:
+Open `demo-output/diff.html` locally. `--allow-command` is required because the synthetic Python adapter is executable; TypeScript and Go use captured JSON.
 
-1. the Go adapter sends a different default page size;
-2. the Python adapter retries one extra time;
-3. the Python adapter omits a field that TypeScript represents as `null`.
+The expected differences are:
 
-The error, pagination, and returned item-field probes agree, proving that the report is semantic rather than a whole-document text diff.
+1. Go sends a different default page size.
+2. Python retries one extra time.
+3. Python omits a field that TypeScript represents as `null`.
 
-## Manifest format
+Errors, pagination, and returned item fields agree, demonstrating a probe-driven semantic diff rather than a whole-document text diff.
 
-v0 requires exactly `typescript`, `python`, and `go` adapter slots plus a baseline. Each adapter provides one of:
+Replay the generated, self-contained repro without executing adapters:
 
-- `{"observation": "relative/capture.json"}` for a captured JSON/HTTP-like observation;
+```sh
+sdk-wirediff compare demo-output/repro.json
+```
+
+## Manifest
+
+Version 0 requires exactly `typescript`, `python`, and `go` adapter slots plus a baseline. Each adapter provides one of:
+
+- `{"observation": "relative/capture.json"}` for captured JSON;
 - `{"command": ["python3", "adapter.py"]}` for trusted argv whose stdout is one JSON object; or
 - `{"inline": {...}}` for self-contained repros.
 
-Commands never use a shell. They are disabled unless `--allow-command` is passed. `{python}` in argv resolves to the interpreter running SDK WireDiff.
+Commands never use a shell and are disabled unless `--allow-command` is passed. `{python}` resolves to the interpreter running SDK WireDiff.
 
-Comparison probes are named RFC 6901 JSON pointers:
+Named RFC 6901 probes select semantics:
 
 ```json
 {
@@ -54,24 +76,25 @@ Comparison probes are named RFC 6901 JSON pointers:
 }
 ```
 
-Transforms are `identity`, `length`, `keys`, `presence`, `sorted`, and `status-class`. `presence` distinguishes missing, explicit `null`, and a value without exposing the value. Header names, methods, status codes, JSON string bodies, and URL query parameters are normalized before probes run. Common credential headers and secret-like query parameters are redacted, and raw URLs are discarded after path/query parsing.
+Transforms are `identity`, `length`, `keys`, `presence`, `sorted`, and `status-class`. `presence` distinguishes missing, explicit `null`, and a value without exposing the value. Header names, methods, statuses, JSON string bodies, and URL queries are normalized first. Common credential headers and secret-like query parameters are redacted; raw URLs are discarded after path/query parsing.
 
-## Output
+## Honest boundaries
 
-The semantic JSON includes normalized observations, per-probe values, baseline-relative differences, and a category summary. HTML is static, escaped, and contains no scripts or remote assets. The minimal repro inlines only normalized semantic values and keeps only divergent probes, so it can be rerun without the original commands or captures:
-
-```sh
-python3 sdk_wirediff.py compare demo-output/repro.json
-```
-
-## Important limitations
-
-- The observation envelope is a small convention, not an OpenTelemetry, HAR, or provider-specific SDK schema. Adapters must emit JSON objects with `request`, `response`, `attempts`, and optional `error`/`pagination` fields.
-- Streaming frame timing, binary bodies, multipart encoding, connection behavior, and concurrency are not modeled in v0.
-- Command adapters are trusted local programs. The opt-in flag prevents accidental execution but is not a process or network sandbox; review manifests before enabling it.
+- The observation envelope is a small convention, not a general traffic or telemetry standard.
+- Streaming frame timing, binary/multipart bodies, connection behavior, and concurrency are not modeled in 0.1.x.
+- Command adapters are trusted local programs. The opt-in flag prevents accidental execution but is not a process or network sandbox.
 - Input and command stdout are capped at 2 MiB after capture. Never use production credentials, customer traffic, or secrets.
-- Differences are baseline-relative and probe-driven. An unprobed behavior is not evidence of equivalence.
-- This tool reports synthetic or coordinated evidence; it must not be used to publish named provider failures without disclosure review.
-- No public license is granted. Ownership, license, trademark, security, contractual, and provenance review remain release gates.
+- Differences are baseline-relative and probe-driven. Unprobed behavior is not evidence of equivalence.
+- Do not publish named provider failures without coordinated disclosure and independent reproduction.
+- A generic gateway, hosted recorder, or production capture agent is out of scope.
 
-See [SCOPE.md](SCOPE.md), [PROVENANCE.md](PROVENANCE.md), and [docs/PLAN.md](docs/PLAN.md).
+## Project navigation
+
+- Design: [architecture](docs/ARCHITECTURE.md), [API stability](docs/API_STABILITY.md), [roadmap](ROADMAP.md)
+- Operations: [troubleshooting](docs/TROUBLESHOOTING.md), [privacy](docs/PRIVACY.md), [accessibility](docs/ACCESSIBILITY.md)
+- Community: [contributing](CONTRIBUTING.md), [conduct](CODE_OF_CONDUCT.md), [support](SUPPORT.md), [governance](GOVERNANCE.md)
+- Safety: [security policy](SECURITY.md), [provenance](PROVENANCE.md), [scope](SCOPE.md)
+- Release: [changelog](CHANGELOG.md), [launch kit](docs/LAUNCH_KIT.md), [MIT license](LICENSE)
+- Related experiments: [optional ecosystem map](ECOSYSTEM.md)
+
+Security vulnerabilities should be reported through a [private security advisory](https://github.com/akigogikar/sdk-wirediff/security/advisories/new), never a public issue.

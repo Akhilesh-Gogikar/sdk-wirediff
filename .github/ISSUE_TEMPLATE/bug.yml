@@ -1,0 +1,50 @@
+name: Bug report
+description: Report a reproducible SDK WireDiff defect using public or synthetic observations.
+title: "bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not include credentials, production traffic, partner data, or security vulnerabilities.
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: 0.1.0 or commit SHA
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal manifest and observations
+      description: Prefer the synthetic fixture and explain which semantic probe is wrong.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected semantic result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual semantic result
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: OS and Python version; adapter runtimes if relevant
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: I removed secrets and private, customer, or partner identifiers.
+          required: true
+        - label: This is not a security vulnerability.
+          required: true

@@ -10,6 +10,8 @@ This roadmap is directional, not a delivery promise. Reproducible semantic evide
 - Document adapter authoring patterns for captured and command-produced observations.
 - Build a sanitized public benchmark only after coordinated review.
 
+The contribution-ready slice is maintained in [ISSUE_SEEDS.md](docs/ISSUE_SEEDS.md). Pointer/report tests are the first rung, bounded execution work is help-wanted, and schema work requires design review. An item joins 0.1.x only with a synthetic proof, deterministic test, privacy review, and named reviewer.
+
 ## Candidate 0.2 work
 
 - Compare more than one baseline without hiding pairwise evidence.

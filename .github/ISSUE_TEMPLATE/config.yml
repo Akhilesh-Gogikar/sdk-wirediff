@@ -6,3 +6,9 @@ contact_links:
   - name: Usage and support
     url: https://github.com/akigogikar/sdk-wirediff/blob/main/SUPPORT.md
     about: Read the support policy before filing an issue.
+  - name: Prepared contributor issues
+    url: https://github.com/akigogikar/sdk-wirediff/blob/main/docs/ISSUE_SEEDS.md
+    about: Choose a scoped issue seed with acceptance criteria, test plan, and likely files.
+  - name: Contribution guide
+    url: https://github.com/akigogikar/sdk-wirediff/blob/main/CONTRIBUTING.md
+    about: Review pathways, clean-room rules, triage expectations, and recognition.

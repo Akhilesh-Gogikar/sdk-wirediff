@@ -23,6 +23,18 @@ body:
       label: Smallest useful change
     validations:
       required: true
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: Contribution path
+      description: How would you like to help if the scope is accepted?
+      options:
+        - I can open a focused pull request
+        - I can provide a synthetic observation
+        - I can review or reproduce
+        - Proposal only
+    validations:
+      required: true
   - type: checkboxes
     id: scope
     attributes:

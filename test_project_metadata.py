@@ -9,7 +9,7 @@ REQUIRED = [
     "LICENSE", "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "SUPPORT.md",
     "GOVERNANCE.md", "ROADMAP.md", "CHANGELOG.md", "ECOSYSTEM.md",
     "docs/ARCHITECTURE.md", "docs/TROUBLESHOOTING.md", "docs/API_STABILITY.md",
-    "docs/PRIVACY.md", "docs/ACCESSIBILITY.md", "docs/LAUNCH_KIT.md", ".github/workflows/ci.yml",
+    "docs/PRIVACY.md", "docs/ACCESSIBILITY.md", "docs/LAUNCH_KIT.md", "docs/ISSUE_SEEDS.md", ".github/workflows/ci.yml",
     ".github/workflows/release.yml", ".github/dependabot.yml",
     ".github/CODEOWNERS",
     ".github/ISSUE_TEMPLATE/bug.yml", ".github/ISSUE_TEMPLATE/feature.yml",

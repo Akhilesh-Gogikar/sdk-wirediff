@@ -3,11 +3,38 @@
 [![CI](https://github.com/akigogikar/sdk-wirediff/actions/workflows/ci.yml/badge.svg)](https://github.com/akigogikar/sdk-wirediff/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/akigogikar/sdk-wirediff)](LICENSE)
 
-> **Status:** 0.1.0 launch candidate in a private repository. It is suitable for synthetic and sanitized public observations, but has not completed the owner’s public-launch review and is not published to a package registry.
+![SDK WireDiff social preview: two SDK behavior wires diverging at the wire boundary](docs/assets/social-preview.png)
 
-SDK WireDiff compares what TypeScript, Python, and Go SDK adapters put on and recover from the wire. A fixture manifest selects semantic probes for defaults, errors, retries, pagination, nullability, and field handling. The standard-library CLI normalizes captured or command-produced JSON observations and emits deterministic JSON, a static HTML report, and a self-contained minimal repro.
+> **Status:** 0.1.0 alpha. It is suitable for synthetic and sanitized public observations from source, but is not published to a package registry.
 
-## Install from a local checkout
+SDK WireDiff answers a concrete compatibility question: **do equivalent TypeScript, Python, and Go SDK calls mean the same thing at the wire boundary?** A fixture manifest selects semantic probes for defaults, errors, retries, pagination, nullability, and field handling. The standard-library CLI normalizes captured or command-produced observations and emits deterministic JSON, an accessible static report, and a self-contained minimal repro.
+
+## Why this is different
+
+- **Semantic, not textual.** Named probes compare behaviors such as missing-versus-null and retry count instead of diffing entire payloads.
+- **The mismatch is replayable.** A generated repro inlines only normalized values needed for divergent probes; it does not need the original adapter commands.
+- **Cross-language assumptions are explicit.** Every difference names its baseline, adapter, category, probe, and values.
+- **Synthetic and offline by default.** The included proof contains no production traffic, credentials, or provider claims.
+
+## 60-second offline quickstart
+
+```sh
+git clone https://github.com/akigogikar/sdk-wirediff.git
+cd sdk-wirediff
+python3 -m unittest -v
+python3 sdk_wirediff.py compare fixtures/demo/manifest.json --allow-command \
+  --json demo-output/diff.json \
+  --html demo-output/diff.html \
+  --repro demo-output/repro.json
+```
+
+Expected result: four tests pass and the report contains exactly three intentional divergences—one default, one retry count, and one missing-versus-null difference. The fixture performs no network I/O.
+
+## Help improve the semantic proof
+
+Start with the [five prepared issue seeds](docs/ISSUE_SEEDS.md): they range from focused pointer/report tests to bounded command streaming and schema design. Comment on the matching issue before coding, or contribute a synthetic edge case or clearer probe documentation. See the [contributor pathways](CONTRIBUTING.md#contributor-pathways) and [scoped roadmap](ROADMAP.md).
+
+## Install the CLI from a local checkout
 
 Requires Python 3.10 through 3.14 (`>=3.10,<3.15`). CI tests all five versions on Linux and Python 3.14 on macOS and Windows. There are no runtime dependencies.
 
@@ -95,6 +122,7 @@ Transforms are `identity`, `length`, `keys`, `presence`, `sorted`, and `status-c
 - Community: [contributing](CONTRIBUTING.md), [conduct](CODE_OF_CONDUCT.md), [support](SUPPORT.md), [governance](GOVERNANCE.md)
 - Safety: [security policy](SECURITY.md), [provenance](PROVENANCE.md), [scope](SCOPE.md)
 - Release: [changelog](CHANGELOG.md), [launch kit](docs/LAUNCH_KIT.md), [MIT license](LICENSE)
+- Contribution queue: [prepared issue seeds](docs/ISSUE_SEEDS.md)
 - Related experiments: [optional ecosystem map](ECOSYSTEM.md)
 
 Security vulnerabilities should be reported through a [private security advisory](https://github.com/akigogikar/sdk-wirediff/security/advisories/new), never a public issue.

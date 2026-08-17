@@ -1,3 +1,10 @@
+## Tracking and scope
+
+Closes #
+
+- Prepared issue / roadmap lane:
+- Requested review focus:
+
 ## What changed
 
 <!-- Explain the user-visible semantic comparison behavior, not only the implementation. -->
@@ -15,3 +22,8 @@
 - [ ] New public sources and terms are recorded in `PROVENANCE.md`.
 - [ ] No named provider failure is asserted without coordinated disclosure.
 - [ ] Documentation, accessibility, privacy, and compatibility impacts were considered.
+
+## Contributor credit
+
+- [ ] My preferred public credit is the identity on this commit/pull request.
+- [ ] Material release-note credit is welcome if this change is included.

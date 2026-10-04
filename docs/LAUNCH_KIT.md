@@ -79,7 +79,7 @@ Use one primary launch and adapt responses instead of repeating identical promot
 
 **Post 2:** `The offline demo intentionally finds 3 differences: a default, a retry count, and missing-vs-null. Output is deterministic JSON + static HTML + a repro that reruns no adapter code.`
 
-**Post 3:** `Limits are explicit: probe-driven, fixed 3-language v0, no production traffic, commands opt-in and not sandboxed. Feedback + five scoped issues: https://github.com/akigogikar/sdk-wirediff`
+**Post 3:** `Limits are explicit: probe-driven, fixed 3-language v0, no production traffic, commands opt-in and not sandboxed. Feedback + five scoped issues: https://github.com/Akhilesh-Gogikar/sdk-wirediff`
 
 ## FAQ
 

@@ -25,9 +25,9 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com/akigogikar/sdk-wirediff"
-Issues = "https://github.com/akigogikar/sdk-wirediff/issues"
-Source = "https://github.com/akigogikar/sdk-wirediff"
+Homepage = "https://github.com/Akhilesh-Gogikar/sdk-wirediff"
+Issues = "https://github.com/Akhilesh-Gogikar/sdk-wirediff/issues"
+Source = "https://github.com/Akhilesh-Gogikar/sdk-wirediff"
 
 [project.scripts]
 sdk-wirediff = "sdk_wirediff:cli"

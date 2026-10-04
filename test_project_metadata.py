@@ -33,7 +33,7 @@ class ProjectMetadataTest(unittest.TestCase):
         self.assertEqual(sdk_wirediff.VERSION, "0.1.0")
         license_text = (ROOT / "LICENSE").read_text(encoding="utf-8")
         self.assertIn("Copyright (c) 2026 Akhilesh Gogikar", license_text)
-        self.assertEqual((ROOT / ".github/CODEOWNERS").read_text(encoding="utf-8"), "* @akigogikar\n")
+        self.assertEqual((ROOT / ".github/CODEOWNERS").read_text(encoding="utf-8"), "* @Akhilesh-Gogikar\n")
         release = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
         self.assertIn("gh release create", release)
         self.assertNotRegex(release, r"pip publish|twine|npm publish")

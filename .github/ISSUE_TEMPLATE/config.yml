@@ -1,14 +1,14 @@
 blank_issues_enabled: false
 contact_links:
   - name: Security vulnerability
-    url: https://github.com/akigogikar/sdk-wirediff/security/advisories/new
+    url: https://github.com/Akhilesh-Gogikar/sdk-wirediff/security/advisories/new
     about: Report vulnerabilities privately; do not open a public issue.
   - name: Usage and support
-    url: https://github.com/akigogikar/sdk-wirediff/blob/main/SUPPORT.md
+    url: https://github.com/Akhilesh-Gogikar/sdk-wirediff/blob/main/SUPPORT.md
     about: Read the support policy before filing an issue.
   - name: Prepared contributor issues
-    url: https://github.com/akigogikar/sdk-wirediff/blob/main/docs/ISSUE_SEEDS.md
+    url: https://github.com/Akhilesh-Gogikar/sdk-wirediff/blob/main/docs/ISSUE_SEEDS.md
     about: Choose a scoped issue seed with acceptance criteria, test plan, and likely files.
   - name: Contribution guide
-    url: https://github.com/akigogikar/sdk-wirediff/blob/main/CONTRIBUTING.md
+    url: https://github.com/Akhilesh-Gogikar/sdk-wirediff/blob/main/CONTRIBUTING.md
     about: Review pathways, clean-room rules, triage expectations, and recognition.

@@ -8,7 +8,7 @@ Harassment, threats, discriminatory language, sexualized attention, deliberate m
 
 ## Enforcement
 
-For ordinary conduct concerns, contact the maintainer through the repository owner’s profile rather than debating the incident publicly. If a report contains sensitive information, use the repository’s [private security advisory form](https://github.com/akigogikar/sdk-wirediff/security/advisories/new) and label it as a conduct report. The maintainer will minimize access to report details, hear affected parties, and choose a proportionate response: clarification, warning, content removal, temporary restriction, or permanent exclusion.
+For ordinary conduct concerns, contact the maintainer through the repository owner’s profile rather than debating the incident publicly. If a report contains sensitive information, use the repository’s [private security advisory form](https://github.com/Akhilesh-Gogikar/sdk-wirediff/security/advisories/new) and label it as a conduct report. The maintainer will minimize access to report details, hear affected parties, and choose a proportionate response: clarification, warning, content removal, temporary restriction, or permanent exclusion.
 
 No reporter is promised a particular outcome or response time. Good-faith reports and participation in an investigation must not be retaliated against. The maintainer will disclose conflicts and seek a neutral reviewer when one is available.
 

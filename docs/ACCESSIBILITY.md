@@ -19,4 +19,4 @@ Before release, traverse with only Tab/Shift+Tab, zoom to 200%, inspect narrow w
 
 Large JSON values can be verbose for screen readers, and the report does not provide interactive column filtering or a condensed accessible view. Automated accessibility conformance and multiple screen-reader/browser combinations are not yet in CI. CLI diagnostics do not have terminal-specific accessibility modes.
 
-Report defects with the bug template and prefix the title `accessibility:`. Use synthetic or redacted observations. Security-sensitive findings belong in the [private advisory form](https://github.com/akigogikar/sdk-wirediff/security/advisories/new).
+Report defects with the bug template and prefix the title `accessibility:`. Use synthetic or redacted observations. Security-sensitive findings belong in the [private advisory form](https://github.com/Akhilesh-Gogikar/sdk-wirediff/security/advisories/new).

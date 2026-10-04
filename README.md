@@ -1,7 +1,7 @@
 # SDK WireDiff
 
-[![CI](https://github.com/akigogikar/sdk-wirediff/actions/workflows/ci.yml/badge.svg)](https://github.com/akigogikar/sdk-wirediff/actions/workflows/ci.yml)
-[![License](https://img.shields.io/github/license/akigogikar/sdk-wirediff)](LICENSE)
+[![CI](https://github.com/Akhilesh-Gogikar/sdk-wirediff/actions/workflows/ci.yml/badge.svg)](https://github.com/Akhilesh-Gogikar/sdk-wirediff/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/Akhilesh-Gogikar/sdk-wirediff)](LICENSE)
 
 ![SDK WireDiff social preview: two SDK behavior wires diverging at the wire boundary](docs/assets/social-preview.png)
 
@@ -19,7 +19,7 @@ SDK WireDiff answers a concrete compatibility question: **do equivalent TypeScri
 ## 60-second offline quickstart
 
 ```sh
-git clone https://github.com/akigogikar/sdk-wirediff.git
+git clone https://github.com/Akhilesh-Gogikar/sdk-wirediff.git
 cd sdk-wirediff
 python3 -m unittest -v
 python3 sdk_wirediff.py compare fixtures/demo/manifest.json --allow-command \
@@ -39,7 +39,7 @@ Start with the [five prepared issue seeds](docs/ISSUE_SEEDS.md): they range from
 Requires Python 3.10 through 3.14 (`>=3.10,<3.15`). CI tests all five versions on Linux and Python 3.14 on macOS and Windows. There are no runtime dependencies.
 
 ```sh
-git clone https://github.com/akigogikar/sdk-wirediff.git
+git clone https://github.com/Akhilesh-Gogikar/sdk-wirediff.git
 cd sdk-wirediff
 python3 -m pip install --no-deps .
 sdk-wirediff --help
@@ -125,4 +125,4 @@ Transforms are `identity`, `length`, `keys`, `presence`, `sorted`, and `status-c
 - Contribution queue: [prepared issue seeds](docs/ISSUE_SEEDS.md)
 - Related experiments: [optional ecosystem map](ECOSYSTEM.md)
 
-Security vulnerabilities should be reported through a [private security advisory](https://github.com/akigogikar/sdk-wirediff/security/advisories/new), never a public issue.
+Security vulnerabilities should be reported through a [private security advisory](https://github.com/Akhilesh-Gogikar/sdk-wirediff/security/advisories/new), never a public issue.

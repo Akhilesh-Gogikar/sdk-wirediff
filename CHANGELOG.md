@@ -19,4 +19,4 @@ All notable changes are recorded here. The project follows semantic versioning w
 - Raw URLs are discarded after normalization; adapter commands remain explicit and unsandboxed.
 - Production traffic, credentials, and named provider failure claims remain excluded.
 
-[0.1.0]: https://github.com/akigogikar/sdk-wirediff/releases/tag/v0.1.0
+[0.1.0]: https://github.com/Akhilesh-Gogikar/sdk-wirediff/releases/tag/v0.1.0

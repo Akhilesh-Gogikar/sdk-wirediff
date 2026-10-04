@@ -9,7 +9,7 @@
 
 ## Report privately
 
-Use a [private GitHub security advisory](https://github.com/akigogikar/sdk-wirediff/security/advisories/new). Do not open a public issue for command-execution problems, path traversal, unsafe parsing, redaction bypass, report injection, secret exposure, or dependency-chain vulnerabilities.
+Use a [private GitHub security advisory](https://github.com/Akhilesh-Gogikar/sdk-wirediff/security/advisories/new). Do not open a public issue for command-execution problems, path traversal, unsafe parsing, redaction bypass, report injection, secret exposure, or dependency-chain vulnerabilities.
 
 Include the affected version or commit, impact, a minimal synthetic reproduction, and suggested mitigation. Never send real credentials or production traffic. You should receive an acknowledgement when practical; remediation timing depends on severity and maintainer availability. Please allow coordinated remediation before disclosure.
 

@@ -57,23 +57,46 @@ class WireDiffTest(unittest.TestCase):
                     "adapters": {"typescript": {"observation": escape}, "python": inline, "go": inline},
                     "compare": {},
                 }), encoding="utf-8")
-                with self.assertRaisesRegex(sdk_wirediff.WireDiffError, "inside the manifest directory"):
+                with self.assertRaisesRegex(sdk_wirediff.WireDiffError, "stay inside the manifest directory"):
                     sdk_wirediff.compare_manifest(manifest)
 
-    def test_attempt_headers_and_queries_are_redacted(self):
+    def test_attempts_are_redacted_without_changing_their_shape(self):
         observation = sdk_wirediff.normalize_observation({
             "request": {"url": "https://synthetic.invalid/x?apiKey=A&page_token=P", "headers": {"Authorization ": "B"}},
-            "attempts": [{
-                "url": "https://synthetic.invalid/x?client_secret=C",
-                "headers": {"X-Goog-Api-Key": "D", "Idempotency-Key": "kept"},
-                "response": {"headers": {"Set-Cookie": "E"}},
-            }],
+            "response": {"url": "https://user:F@synthetic.invalid/x?page=2"},
+            "attempts": [
+                {
+                    "url": "https://synthetic.invalid/x?client_secret=C&page=2",
+                    "headers": {"X-Goog-Api-Key": "D", "Retry-After": 1},
+                    "response": {"headers": {"Set-Cookie": "E"}},
+                },
+                {"headers": [["Retry-After", "1"]], "query": "page=2", "url": "http://[::1/x"},
+            ],
         })
         text = json.dumps(observation)
-        for secret in ('"A"', '"B"', '"C"', '"D"', '"E"', "synthetic.invalid"):
+        for secret in ('"A"', '"B"', "C&", '"D"', '"E"', "F@"):
             self.assertNotIn(secret, text)
         self.assertEqual(observation["request"]["query"]["page_token"], "P")
-        self.assertEqual(observation["attempts"][0]["headers"]["idempotency-key"], "kept")
+        first = observation["attempts"][0]
+        self.assertEqual(first["url"], "https://synthetic.invalid/x?client_secret=[REDACTED]&page=2")
+        self.assertEqual(first["headers"]["Retry-After"], 1)
+        self.assertEqual(observation["response"]["url"], "https://synthetic.invalid/x?page=2")
+        self.assertEqual(observation["attempts"][1]["query"], "page=2")
+        self.assertEqual(observation["attempts"][1]["url"], "[REDACTED]")
+
+    def test_repro_replays_probe_names_with_pointer_characters(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "manifest.json"
+            path.write_text(json.dumps({
+                "adapters": {
+                    "typescript": {"inline": {"a": 1}}, "python": {"inline": {"a": 2}}, "go": {"inline": {"a": 1}},
+                },
+                "compare": {"defaults": {"a/b~c": "/a"}},
+            }), encoding="utf-8")
+            result = sdk_wirediff.compare_manifest(path)
+            path.write_text(json.dumps(sdk_wirediff.minimal_repro(result)), encoding="utf-8")
+            replay = sdk_wirediff.compare_manifest(path)
+        self.assertEqual(replay["diffs"], result["diffs"])
 
 
 if __name__ == "__main__":

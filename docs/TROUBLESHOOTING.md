@@ -4,7 +4,7 @@
 
 At least one adapter uses `command`. Review the manifest and executable first. If it is trusted and requires no production credentials, rerun with `--allow-command`. Prefer captured JSON when execution is unnecessary.
 
-## `observation must be a JSON file inside the manifest directory`
+## `observation must stay inside the manifest directory`
 
 Captured observations are resolved relative to the manifest and may not escape it through `..`, an absolute path, or a symlink. Copy the sanitized capture next to the manifest, or use an `inline` observation.
 

@@ -103,7 +103,7 @@ Named RFC 6901 probes select semantics:
 }
 ```
 
-Transforms are `identity`, `length`, `keys`, `presence`, `sorted`, and `status-class`. `presence` distinguishes missing, explicit `null`, and a value without exposing the value. Header names, methods, statuses, JSON string bodies, and URL queries are normalized first. Common credential headers and secret-like query parameters are redacted in the request and in every recorded attempt; raw URLs in those places are discarded after path/query parsing. Response bodies and other fields are not redacted.
+Transforms are `identity`, `length`, `keys`, `presence`, `sorted`, and `status-class`. `presence` distinguishes missing, explicit `null`, and a value without exposing the value. Header names, methods, statuses, JSON string bodies, and URL queries are normalized first. Common credential headers and secret-like query parameters are redacted; the request URL is discarded after path/query parsing. Recorded attempts and `response.url` keep their shape, but credential headers, secret-like query values, and URL userinfo are replaced. Response bodies and other fields are not redacted.
 
 ## Honest boundaries
 

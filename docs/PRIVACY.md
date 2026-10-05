@@ -9,7 +9,7 @@ SDK WireDiff has no telemetry, analytics, remote assets, hosted service, or buil
 - Normalized requests, responses, attempts, errors, pagination, and selected semantic values.
 - Deterministic JSON, HTML, and repro files written to user-selected paths.
 
-Common authorization, cookie, and API-key headers and token-like URL query fields are replaced with `[REDACTED]` in the request and in each recorded attempt (including an attempt's nested `request`/`response`); raw URLs there are removed after path/query parsing. Matching is by exact name (see `SENSITIVE_HEADERS` and `SENSITIVE_QUERY` in `sdk_wirediff.py`) so pagination tokens and idempotency keys stay comparable. This is defense in depth, not a complete data-loss-prevention system. Bodies, other fields, adapter stderr, paths, and nonstandard secrets may remain.
+Common authorization, cookie, and API-key headers and token-like URL query fields are replaced with `[REDACTED]` in the request, `response.url`, and each recorded attempt (including an attempt's nested `request`/`response`). The request URL is removed after path/query parsing; other URLs keep their shape with userinfo removed and secret-like query values replaced. Matching is by exact name (see `SENSITIVE_HEADERS` and `SENSITIVE_QUERY` in `sdk_wirediff.py`) so pagination tokens and idempotency keys stay comparable. This is defense in depth, not a complete data-loss-prevention system. Bodies, other fields, adapter stderr, paths, and nonstandard secrets may remain.
 
 ## Command adapters
 

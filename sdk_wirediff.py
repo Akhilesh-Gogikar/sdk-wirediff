@@ -12,7 +12,7 @@ from pathlib import Path
 import subprocess
 import sys
 from typing import Any
-from urllib.parse import parse_qs, urlsplit
+from urllib.parse import parse_qs, unquote_plus, urlsplit
 
 
 SCHEMA_VERSION = 1
@@ -90,7 +90,7 @@ def normalized_query(value: Any) -> dict[str, Any]:
     output: dict[str, Any] = {}
     for key in sorted(value, key=str):
         item = value[key]
-        if str(key).strip().lower().replace("-", "_") in SENSITIVE_QUERY:
+        if query_key(key) in SENSITIVE_QUERY:
             output[str(key)] = "[REDACTED]"
         elif isinstance(item, list):
             output[str(key)] = [str(entry) for entry in item]
@@ -101,18 +101,34 @@ def normalized_query(value: Any) -> dict[str, Any]:
     return output
 
 
-def redact_exchange(part: dict[str, Any]) -> None:
-    """Replace a raw URL with path/query and redact headers and query in place."""
-    if "headers" in part:
-        part["headers"] = normalized_headers(part["headers"])
+def query_key(key: Any) -> str:
+    return str(key).strip().lower().replace("-", "_")
+
+
+def redacted_url(value: str) -> str:
+    """Drop userinfo and redact secret-like query values without re-encoding the rest."""
+    try:
+        parts = urlsplit(value)
+    except ValueError:
+        return "[REDACTED]"
+    fields = parts.query.split("&") if parts.query else []
+    redacted = [
+        f"{field.partition('=')[0]}=[REDACTED]" if query_key(unquote_plus(field.partition("=")[0])) in SENSITIVE_QUERY else field
+        for field in fields
+    ]
+    netloc = parts.netloc.rpartition("@")[2]
+    if redacted == fields and netloc == parts.netloc:
+        return value
+    return parts._replace(netloc=netloc, query="&".join(redacted)).geturl()
+
+
+def redact_in_place(part: dict[str, Any]) -> None:
+    """Redact a recorded attempt without renaming keys or changing value types."""
+    for field, sensitive, key_of in (("headers", SENSITIVE_HEADERS, lambda key: str(key).strip().lower()), ("query", SENSITIVE_QUERY, query_key)):
+        if isinstance(part.get(field), dict):
+            part[field] = {key: "[REDACTED]" if key_of(key) in sensitive else item for key, item in part[field].items()}
     if isinstance(part.get("url"), str):
-        parsed = urlsplit(part.pop("url"))
-        part.setdefault("path", parsed.path or "/")
-        if "query" not in part:
-            query = parse_qs(parsed.query, keep_blank_values=True)
-            part["query"] = {key: values[0] if len(values) == 1 else values for key, values in sorted(query.items())}
-    if "query" in part:
-        part["query"] = normalized_query(part["query"])
+        part["url"] = redacted_url(part["url"])
 
 
 def normalize_observation(raw: Any) -> dict[str, Any]:
@@ -126,9 +142,18 @@ def normalize_observation(raw: Any) -> dict[str, Any]:
     request = copy.deepcopy(request)
     if "method" in request:
         request["method"] = str(request["method"]).upper()
-    request.setdefault("headers", None)
-    redact_exchange(request)
-    request.setdefault("query", {})
+    request["headers"] = normalized_headers(request.get("headers"))
+    if isinstance(request.get("url"), str):
+        try:
+            parsed = urlsplit(request["url"])
+        except ValueError as error:
+            raise WireDiffError(f"request.url is not a valid URL: {error}") from error
+        request.setdefault("path", parsed.path or "/")
+        if "query" not in request:
+            query = parse_qs(parsed.query, keep_blank_values=True)
+            request["query"] = {key: values[0] if len(values) == 1 else values for key, values in sorted(query.items())}
+        request.pop("url", None)
+    request["query"] = normalized_query(request.get("query"))
     if "body" in request:
         request["body"] = json_body(request["body"])
     output["request"] = request
@@ -145,6 +170,8 @@ def normalize_observation(raw: Any) -> dict[str, Any]:
         except (TypeError, ValueError) as error:
             raise WireDiffError("response.status must be an integer") from error
     response["headers"] = normalized_headers(response.get("headers"))
+    if isinstance(response.get("url"), str):
+        response["url"] = redacted_url(response["url"])
     if "body" in response:
         response["body"] = json_body(response["body"])
     output["response"] = response
@@ -157,7 +184,7 @@ def normalize_observation(raw: Any) -> dict[str, Any]:
         if isinstance(attempt, dict):
             for part in (attempt, attempt.get("request"), attempt.get("response")):
                 if isinstance(part, dict):
-                    redact_exchange(part)
+                    redact_in_place(part)
     output["attempts"] = attempts
 
     error_value = output.get("error", MISSING)
@@ -277,10 +304,15 @@ def load_adapter(name: str, spec: Any, base_dir: Path, allow_command: bool) -> t
         relative = spec["observation"]
         if not isinstance(relative, str) or not relative:
             raise WireDiffError(f"adapter {name} observation must be a path")
-        root = base_dir.resolve()
-        target = (root / relative).resolve()
-        if not target.is_relative_to(root) or not target.is_file():
-            raise WireDiffError(f"adapter {name} observation must be a JSON file inside the manifest directory")
+        try:
+            root = base_dir.resolve()
+            target = (root / relative).resolve()
+        except (OSError, RuntimeError) as error:
+            raise WireDiffError(f"adapter {name} observation path cannot be resolved: {error}") from error
+        if not target.is_relative_to(root):
+            raise WireDiffError(f"adapter {name} observation must stay inside the manifest directory: {relative}")
+        if not target.is_file():
+            raise WireDiffError(f"adapter {name} observation is not a readable file: {relative}")
         raw = read_json(target)
         return normalize_observation(raw), {"kind": "file", "value": relative}
     if mode == "inline":
@@ -384,7 +416,8 @@ def minimal_repro(result: dict[str, Any]) -> dict[str, Any]:
     # compact semantic values directly in inline observations.
     divergent = {(item["category"], item["probe"]) for item in result["diffs"]}
     for category, probe in sorted(divergent):
-        compare.setdefault(category, {})[probe] = f"/semantics/{category}/{probe}"
+        escaped = probe.replace("~", "~0").replace("/", "~1")
+        compare.setdefault(category, {})[probe] = f"/semantics/{category}/{escaped}"
     adapters = {}
     involved = {result["baseline"], *(item["adapter"] for item in result["diffs"])}
     for name in REQUIRED_ADAPTERS:

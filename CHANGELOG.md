@@ -10,9 +10,13 @@ All notable changes are recorded here. The project follows semantic versioning w
 
 - Reject captured-observation paths that resolve outside the manifest directory (`..`, absolute paths, or symlinks) or to a non-regular file; previously, any readable local JSON file could be copied into the result.
 - Read input files at most 2 MiB, including FIFOs and devices whose reported size is zero.
-- Redact credential headers and secret-like query fields, and drop raw URLs, in every recorded `attempts[]` entry as well as the request. Strip header names before matching, and cover more common names such as `X-Goog-Api-Key`, `X-Auth-Token`, `apiKey`, `client_secret`, and `refresh_token`.
+- Redact credential headers, secret-like query values, and URL userinfo in `response.url` and every recorded `attempts[]` entry (including nested `request`/`response`), without renaming keys or changing value types. Strip header names before matching, and cover more common names such as `X-Goog-Api-Key`, `X-Auth-Token`, `apiKey`, `client_secret`, and `refresh_token`.
 - HTML-escape every summary value in `render` output.
-- Report deeply nested input JSON as a concise error instead of a traceback.
+- Report deeply nested input JSON, invalid request URLs, and unresolvable observation paths as concise errors instead of tracebacks.
+
+### Fixed
+
+- Minimal repros replay probes whose names contain `/` or `~`.
 
 ### Changed
 

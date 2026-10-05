@@ -1,4 +1,6 @@
+import os
 import pathlib
+import re
 import unittest
 
 import sdk_wirediff
@@ -43,14 +45,22 @@ class ProjectMetadataTest(unittest.TestCase):
         self.assertIn(f"## [{sdk_wirediff.VERSION}] - ", changelog)
 
     def test_ecosystem_names_only_public_tools(self):
-        text = (ROOT / "ECOSYSTEM.md").read_text(encoding="utf-8")
-        self.assertIn("optional and informational", text)
-        for public in ("sdk-wirediff", "releasefence", "reviewbus", "directivegraph"):
-            self.assertIn(f"https://github.com/Akhilesh-Gogikar/{public}", text)
-        # Unreleased sibling tools must not be named until they are public.
-        lowered = text.lower()
-        for tool in ("semver-weather", "semver weather", "tokenflame", "mcp-client-autopsy", "mcp client autopsy"):
-            self.assertNotIn(tool, lowered)
+        # An allowlist, not a denylist: a denylist would itself name unreleased tools.
+        public = {"sdk-wirediff", "releasefence", "directivegraph", "reviewbus"}
+        owner_repo = re.compile(r"Akhilesh-Gogikar/([A-Za-z0-9_-]+)", re.IGNORECASE)
+        ecosystem = (ROOT / "ECOSYSTEM.md").read_text(encoding="utf-8")
+        self.assertIn("optional and informational", ecosystem)
+        entries = [line for line in ecosystem.splitlines() if line.lstrip().startswith(("-", "*", "|"))]
+        self.assertEqual(len(entries), len(public))
+        self.assertEqual({repo.lower() for repo in owner_repo.findall(ecosystem)}, public)
+        linked = set()
+        for directory, subdirs, files in os.walk(ROOT):
+            subdirs[:] = [name for name in subdirs if name == ".github" or not name.startswith(".")]
+            for name in files:
+                if name.endswith((".md", ".yml", ".toml")):
+                    text = (pathlib.Path(directory) / name).read_text(encoding="utf-8")
+                    linked |= {repo.lower() for repo in owner_repo.findall(text)}
+        self.assertEqual(linked - public, set())
 
 
 if __name__ == "__main__":

@@ -16,11 +16,21 @@ from urllib.parse import parse_qs, urlsplit
 
 
 SCHEMA_VERSION = 1
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 MAX_INPUT_BYTES = 2 * 1024 * 1024
 REQUIRED_ADAPTERS = ("typescript", "python", "go")
 CATEGORIES = ("defaults", "errors", "retries", "pagination", "nulls", "fields")
 MISSING = object()
+# ponytail: exact-name denylists keep pagination tokens and idempotency keys
+# comparable; substring matching would redact them too.
+SENSITIVE_HEADERS = frozenset({
+    "authorization", "proxy-authorization", "cookie", "set-cookie", "api-key", "x-api-key",
+    "x-auth-token", "x-goog-api-key", "x-amz-security-token",
+})
+SENSITIVE_QUERY = frozenset({
+    "api_key", "apikey", "key", "access_token", "refresh_token", "id_token", "token", "client_secret",
+    "secret", "password", "signature", "sig", "x_amz_signature", "x_amz_credential", "x_amz_security_token",
+})
 
 
 class WireDiffError(Exception):
@@ -33,13 +43,14 @@ def canonical_json(value: Any) -> str:
 
 def read_json(path: Path) -> Any:
     try:
-        if path.stat().st_size > MAX_INPUT_BYTES:
+        with path.open("rb") as handle:
+            data = handle.read(MAX_INPUT_BYTES + 1)
+        if len(data) > MAX_INPUT_BYTES:
             raise WireDiffError(f"input exceeds 2 MiB: {path}")
-        with path.open("r", encoding="utf-8") as handle:
-            return json.load(handle)
+        return json.loads(data.decode("utf-8"))
     except WireDiffError:
         raise
-    except (OSError, json.JSONDecodeError) as error:
+    except (OSError, ValueError) as error:
         raise WireDiffError(f"cannot read JSON {path}: {error}") from error
 
 
@@ -65,10 +76,9 @@ def normalized_headers(value: Any) -> dict[str, str]:
         return {}
     if not isinstance(value, dict):
         raise WireDiffError("HTTP headers must be an object")
-    sensitive = {"authorization", "proxy-authorization", "cookie", "set-cookie", "x-api-key"}
     return {
-        str(key).lower(): "[REDACTED]" if str(key).lower() in sensitive else str(item).strip()
-        for key, item in sorted(value.items(), key=lambda pair: str(pair[0]).lower())
+        str(key).strip().lower(): "[REDACTED]" if str(key).strip().lower() in SENSITIVE_HEADERS else str(item).strip()
+        for key, item in sorted(value.items(), key=lambda pair: str(pair[0]).strip().lower())
     }
 
 
@@ -80,8 +90,7 @@ def normalized_query(value: Any) -> dict[str, Any]:
     output: dict[str, Any] = {}
     for key in sorted(value, key=str):
         item = value[key]
-        lowered = str(key).lower().replace("-", "_")
-        if lowered in {"api_key", "access_token", "token", "secret", "password", "signature"}:
+        if str(key).strip().lower().replace("-", "_") in SENSITIVE_QUERY:
             output[str(key)] = "[REDACTED]"
         elif isinstance(item, list):
             output[str(key)] = [str(entry) for entry in item]
@@ -90,6 +99,20 @@ def normalized_query(value: Any) -> dict[str, Any]:
         else:
             output[str(key)] = str(item)
     return output
+
+
+def redact_exchange(part: dict[str, Any]) -> None:
+    """Replace a raw URL with path/query and redact headers and query in place."""
+    if "headers" in part:
+        part["headers"] = normalized_headers(part["headers"])
+    if isinstance(part.get("url"), str):
+        parsed = urlsplit(part.pop("url"))
+        part.setdefault("path", parsed.path or "/")
+        if "query" not in part:
+            query = parse_qs(parsed.query, keep_blank_values=True)
+            part["query"] = {key: values[0] if len(values) == 1 else values for key, values in sorted(query.items())}
+    if "query" in part:
+        part["query"] = normalized_query(part["query"])
 
 
 def normalize_observation(raw: Any) -> dict[str, Any]:
@@ -103,15 +126,9 @@ def normalize_observation(raw: Any) -> dict[str, Any]:
     request = copy.deepcopy(request)
     if "method" in request:
         request["method"] = str(request["method"]).upper()
-    request["headers"] = normalized_headers(request.get("headers"))
-    if isinstance(request.get("url"), str):
-        parsed = urlsplit(request["url"])
-        request.setdefault("path", parsed.path or "/")
-        if "query" not in request:
-            query = parse_qs(parsed.query, keep_blank_values=True)
-            request["query"] = {key: values[0] if len(values) == 1 else values for key, values in sorted(query.items())}
-        request.pop("url", None)
-    request["query"] = normalized_query(request.get("query"))
+    request.setdefault("headers", None)
+    redact_exchange(request)
+    request.setdefault("query", {})
     if "body" in request:
         request["body"] = json_body(request["body"])
     output["request"] = request
@@ -135,6 +152,12 @@ def normalize_observation(raw: Any) -> dict[str, Any]:
     attempts = output.get("attempts", [])
     if not isinstance(attempts, list):
         raise WireDiffError("observation.attempts must be an array")
+    # ponytail: attempts have no fixed schema; redact the request-like fields we recognize.
+    for attempt in attempts:
+        if isinstance(attempt, dict):
+            for part in (attempt, attempt.get("request"), attempt.get("response")):
+                if isinstance(part, dict):
+                    redact_exchange(part)
     output["attempts"] = attempts
 
     error_value = output.get("error", MISSING)
@@ -254,7 +277,11 @@ def load_adapter(name: str, spec: Any, base_dir: Path, allow_command: bool) -> t
         relative = spec["observation"]
         if not isinstance(relative, str) or not relative:
             raise WireDiffError(f"adapter {name} observation must be a path")
-        raw = read_json((base_dir / relative).resolve())
+        root = base_dir.resolve()
+        target = (root / relative).resolve()
+        if not target.is_relative_to(root) or not target.is_file():
+            raise WireDiffError(f"adapter {name} observation must be a JSON file inside the manifest directory")
+        raw = read_json(target)
         return normalize_observation(raw), {"kind": "file", "value": relative}
     if mode == "inline":
         return normalize_observation(spec["inline"]), {"kind": "inline", "value": "manifest"}
@@ -364,7 +391,10 @@ def minimal_repro(result: dict[str, Any]) -> dict[str, Any]:
         semantics = result["adapters"][name]["semantics"]
         # v0 manifests require all three language slots; uninvolved slots use
         # the baseline semantics so the repro cannot add unrelated diffs.
-        selected = semantics if name in involved else result["adapters"][result["baseline"]]["semantics"]
+        source = semantics if name in involved else result["adapters"][result["baseline"]]["semantics"]
+        selected: dict[str, dict[str, Any]] = {}
+        for category, probe in sorted(divergent):
+            selected.setdefault(category, {})[probe] = source[category][probe]
         adapters[name] = {"inline": {"semantics": selected}}
     return {
         "name": f"{result['name']}-minimal-repro",
@@ -400,7 +430,7 @@ def render_html(result: dict[str, Any]) -> str:
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'"><title>{html.escape(str(result.get('name', 'SDK WireDiff')))}</title><style>
 :root{{font-family:ui-sans-serif,system-ui,sans-serif;color:#172033;background:#f4f7fb}}body{{max-width:1200px;margin:auto;padding:2rem;line-height:1.5}}.skip-link{{position:absolute;left:-9999px}}.skip-link:focus{{left:1rem;top:1rem;background:#fff;color:#111827;padding:.75rem;z-index:1;outline:3px solid #174ea6}}.summary{{display:flex;gap:1rem;flex-wrap:wrap}}.metric{{background:#fff;border:1px solid #9ca9ba;border-radius:10px;padding:1rem;min-width:11rem}}.table-region{{overflow-x:auto}}.table-region:focus-visible{{outline:3px solid #f59e0b;outline-offset:3px}}table{{width:100%;border-collapse:collapse;background:#fff;margin-top:1.5rem}}caption{{font-weight:700;text-align:left;padding:.75rem 0}}th,td{{border:1px solid #9ca9ba;padding:.7rem;text-align:left;vertical-align:top}}th{{background:#172033;color:#fff}}code{{white-space:pre-wrap;overflow-wrap:anywhere}}footer{{margin-top:2rem;color:#435066}}</style></head><body>
 <a class="skip-link" href="#main-content">Skip to report</a><header><h1>{html.escape(str(result.get('name', 'SDK WireDiff')))}</h1><p>Semantic cross-SDK differential report.</p></header><main id="main-content">
-<section class="summary" aria-label="Report summary"><div class="metric"><strong>{summary.get('adapterCount', 0)}</strong><br>adapters</div><div class="metric"><strong>{summary.get('divergenceCount', 0)}</strong><br>divergences</div><div class="metric"><strong>{html.escape(', '.join(summary.get('divergentCategories', [])) or 'none')}</strong><br>categories</div></section>
+<section class="summary" aria-label="Report summary"><div class="metric"><strong>{html.escape(str(summary.get('adapterCount', 0)))}</strong><br>adapters</div><div class="metric"><strong>{html.escape(str(summary.get('divergenceCount', 0)))}</strong><br>divergences</div><div class="metric"><strong>{html.escape(', '.join(summary.get('divergentCategories', [])) or 'none')}</strong><br>categories</div></section>
 <div class="table-region" role="region" aria-label="Semantic differences" tabindex="0"><table><caption>Baseline-relative semantic differences</caption><thead><tr><th scope="col">Category</th><th scope="col">Probe</th><th scope="col">Baseline</th><th scope="col">Baseline value</th><th scope="col">Adapter</th><th scope="col">Observed value</th></tr></thead><tbody>{''.join(rows)}</tbody></table></div></main>
 <footer>Static report generated by SDK WireDiff. No remote assets, scripts, or traffic captures.</footer></body></html>\n"""
 
@@ -439,6 +469,9 @@ def cli() -> int:
         return main()
     except WireDiffError as error:
         print(f"sdk-wirediff: {error}", file=sys.stderr)
+        return 1
+    except RecursionError:
+        print("sdk-wirediff: input JSON is nested too deeply", file=sys.stderr)
         return 1
 
 

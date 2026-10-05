@@ -18,7 +18,7 @@ Choose the smallest rung that fits the evidence you want to improve; the ladder 
 3. **Design contributor (`advanced`)** — propose streaming bounds, versioned schemas, compatibility policy, or new semantic envelopes. Begin with a written design and synthetic proof.
 4. **Reviewer / steward** — replay repros, verify privacy/redaction, check baseline semantics and accessibility, then help triage related reports.
 
-The [prepared issue seeds](docs/ISSUE_SEEDS.md) provide five concrete starting points with acceptance criteria and likely files. When a corresponding issue exists, comment with your intended approach before coding. If a claimed issue has no update for 14 days, another contributor may ask to continue it.
+The [issue seeds](docs/ISSUE_SEEDS.md) give five contributor-ready issues with acceptance criteria and likely files. Comment on the linked issue with your intended approach before coding. If a claimed issue has no update for 14 days, another contributor may ask to continue it.
 
 ## Triage and recognition
 

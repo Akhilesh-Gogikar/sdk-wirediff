@@ -15,4 +15,4 @@ Contributors submit issues, observations, documentation, or code. Repeat contrib
 
 ## Releases and succession
 
-The release steward verifies [LAUNCH_KIT.md](docs/LAUNCH_KIT.md), approves the changelog, and triggers a source-only release through a reviewed tag. A future successor and effective date will be recorded here before access changes.
+The release steward runs the test suite and offline demo, approves the changelog, and triggers a source-only release through a reviewed tag. A future successor and effective date will be recorded here before access changes.

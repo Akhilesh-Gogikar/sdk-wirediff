@@ -4,9 +4,8 @@
 - `social-preview.png` is the 1280 × 640 upload-ready GitHub social preview.
 - README alt text: “SDK WireDiff social preview: two SDK behavior wires diverging at the wire boundary”
 
-Before public launch, upload `social-preview.png` under **Settings → General →
-Social preview**, then inspect the anonymous link preview on a light and dark
-surface. GitHub does not take this file from the repository automatically.
+GitHub does not take this file from the repository automatically; a maintainer
+uploads `social-preview.png` under **Settings → General → Social preview**.
 
 Keep the name, benefit, version, and repository URL synchronized with
 `README.md`. Do not add adoption counts, external logos, partner names, or

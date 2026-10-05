@@ -4,6 +4,10 @@ All notable changes are recorded here. The project follows semantic versioning w
 
 ## [Unreleased]
 
+### Changed
+
+- List ReviewBus and DirectiveGraph in the optional ecosystem map now that both are public.
+
 ## [0.1.1] - 2026-10-05
 
 ### Security

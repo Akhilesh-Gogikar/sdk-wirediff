@@ -45,11 +45,11 @@ class ProjectMetadataTest(unittest.TestCase):
     def test_ecosystem_names_only_public_tools(self):
         text = (ROOT / "ECOSYSTEM.md").read_text(encoding="utf-8")
         self.assertIn("optional and informational", text)
-        for public in ("sdk-wirediff", "releasefence"):
+        for public in ("sdk-wirediff", "releasefence", "reviewbus", "directivegraph"):
             self.assertIn(f"https://github.com/Akhilesh-Gogikar/{public}", text)
         # Unreleased sibling tools must not be named until they are public.
         lowered = text.lower()
-        for tool in ("semver-weather", "semver weather", "reviewbus", "tokenflame", "mcp-client-autopsy", "mcp client autopsy", "directivegraph"):
+        for tool in ("semver-weather", "semver weather", "tokenflame", "mcp-client-autopsy", "mcp client autopsy"):
             self.assertNotIn(tool, lowered)
 
 

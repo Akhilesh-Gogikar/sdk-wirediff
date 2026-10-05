@@ -1,12 +1,14 @@
-# Prepared issue seeds
+# Issue seeds
 
-These are issue drafts, not proof that work has been accepted or assigned. Create one issue per seed, preserve the exact title/labels below, and link back here. All observations must be synthetic or sanitized public material; never attach production traffic or credentials.
+These mirror the five contributor-ready GitHub issues and preserve their design context; the [live ready-for-contribution list](https://github.com/Akhilesh-Gogikar/sdk-wirediff/issues?q=is%3Aissue+is%3Aopen+label%3A%22status%3A+ready%22) is authoritative for assignment, labels, and status. Confirm the code still matches each seed before contributing. All observations must be synthetic or sanitized public material; never attach production traffic or credentials.
 
 ## 1. List valid transforms when a manifest uses an unknown transform
 
-**Proposed title:** `List valid transforms when a manifest uses an unknown transform`
+**Issue:** [#4](https://github.com/Akhilesh-Gogikar/sdk-wirediff/issues/4)
 
-**Labels:** `good first issue`, `cli`, `tests`
+**Labels:** `cli`, `difficulty: beginner`, `good first issue`, `help wanted`, `mentored`, `size: S`, `status: ready`, `tests`
+
+**Milestone:** v0.2 — community evidence
 
 **Rationale:** `transform_value` reports the unsupported name but does not tell the fixture author which transforms are valid. The allowed set is small and stable within 0.1.x, so the error can be actionable without a dependency.
 
@@ -27,9 +29,11 @@ These are issue drafts, not proof that work has been accepted or assigned. Creat
 
 ## 2. Add a table-driven JSON Pointer edge-case matrix
 
-**Proposed title:** `Add a table-driven JSON Pointer edge-case matrix`
+**Issue:** [#5](https://github.com/Akhilesh-Gogikar/sdk-wirediff/issues/5)
 
-**Labels:** `good first issue`, `json-pointer`, `tests`
+**Labels:** `difficulty: beginner`, `good first issue`, `help wanted`, `json-pointer`, `mentored`, `size: M`, `status: ready`, `tests`
+
+**Milestone:** v0.2 — community evidence
 
 **Rationale:** The demo covers ordinary object and array paths, while `pointer_get` also implements escaped `/` and `~`, invalid indices, scalar traversal, empty pointer, missing, and explicit null. Those distinctions deserve a compact conformance table.
 
@@ -50,9 +54,11 @@ These are issue drafts, not proof that work has been accepted or assigned. Creat
 
 ## 3. Cover command timeout and nonzero-exit contracts with synthetic adapters
 
-**Proposed title:** `Cover command timeout and nonzero-exit contracts with synthetic adapters`
+**Issue:** [#6](https://github.com/Akhilesh-Gogikar/sdk-wirediff/issues/6)
 
-**Labels:** `help wanted`, `adapters`, `reliability`, `tests`
+**Labels:** `adapters`, `difficulty: intermediate`, `help wanted`, `reliability`, `size: M`, `status: ready`, `tests`
+
+**Milestone:** v0.2 — community evidence
 
 **Rationale:** The command adapter is opt-in and handles timeout, spawn failure, nonzero exit, stderr truncation in its error, and malformed stdout, but the synthetic proof currently covers only successful execution and refusal without consent.
 
@@ -74,9 +80,11 @@ These are issue drafts, not proof that work has been accepted or assigned. Creat
 
 ## 4. Enforce the adapter stdout limit while streaming
 
-**Proposed title:** `Enforce the adapter stdout limit while streaming`
+**Issue:** [#7](https://github.com/Akhilesh-Gogikar/sdk-wirediff/issues/7)
 
-**Labels:** `help wanted`, `advanced`, `security`, `performance`
+**Labels:** `advanced`, `difficulty: advanced`, `help wanted`, `performance`, `security`, `size: L`, `status: ready`
+
+**Milestone:** v0.2 — community evidence
 
 **Rationale:** `load_adapter` currently uses `subprocess.run(..., capture_output=True)` and checks the 2 MiB limit after the child exits. A noisy or hostile trusted adapter can consume unbounded memory before rejection. The limit should apply during capture.
 
@@ -98,9 +106,11 @@ These are issue drafts, not proof that work has been accepted or assigned. Creat
 
 ## 5. Define versioned schemas for manifests, observations, results, and repros
 
-**Proposed title:** `Define versioned schemas for manifests, observations, results, and repros`
+**Issue:** [#8](https://github.com/Akhilesh-Gogikar/sdk-wirediff/issues/8)
 
-**Labels:** `advanced`, `api`, `design`, `documentation`
+**Labels:** `advanced`, `api`, `design`, `difficulty: advanced`, `documentation`, `size: L`, `status: ready`
+
+**Milestone:** v0.2 — community evidence
 
 **Rationale:** Runtime validation and examples define the current envelopes, but adapter authors lack machine-readable contracts. Separate schemas can clarify input versus normalized output without implying that arbitrary command execution is safe.
 

@@ -15,4 +15,4 @@ Include the affected version or commit, impact, a minimal synthetic reproduction
 
 ## Security model
 
-SDK WireDiff treats manifests and observations as untrusted data, but an explicitly enabled adapter command is trusted executable code with the invoking user’s host permissions. The tool is not a sandbox, traffic recorder, credential broker, or safe way to execute an untrusted fixture. Common credential headers and secret-like query fields are redacted, but arbitrary bodies can still contain sensitive values. See [PRIVACY.md](docs/PRIVACY.md).
+SDK WireDiff treats manifests and observations as untrusted data: observation paths must resolve to a regular file inside the manifest directory, and inputs are read at most 2 MiB. However, an explicitly enabled adapter command is trusted executable code with the invoking user’s host permissions. The tool is not a sandbox, traffic recorder, credential broker, or safe way to execute an untrusted fixture. Common credential headers and secret-like query fields are redacted, but arbitrary bodies can still contain sensitive values. See [PRIVACY.md](docs/PRIVACY.md).

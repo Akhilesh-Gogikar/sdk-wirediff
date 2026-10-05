@@ -5,7 +5,7 @@
 
 ![SDK WireDiff social preview: two SDK behavior wires diverging at the wire boundary](docs/assets/social-preview.png)
 
-> **Status:** 0.1.0 alpha. It is suitable for synthetic and sanitized public observations from source, but is not published to a package registry.
+> **Status:** 0.1.1 alpha. It is suitable for synthetic and sanitized public observations from source, but is not published to a package registry.
 
 SDK WireDiff answers a concrete compatibility question: **do equivalent TypeScript, Python, and Go SDK calls mean the same thing at the wire boundary?** A fixture manifest selects semantic probes for defaults, errors, retries, pagination, nullability, and field handling. The standard-library CLI normalizes captured or command-produced observations and emits deterministic JSON, an accessible static report, and a self-contained minimal repro.
 
@@ -28,11 +28,11 @@ python3 sdk_wirediff.py compare fixtures/demo/manifest.json --allow-command \
   --repro demo-output/repro.json
 ```
 
-Expected result: four tests pass and the report contains exactly three intentional divergences—one default, one retry count, and one missing-versus-null difference. The fixture performs no network I/O.
+Expected result: all tests pass and the report contains exactly three intentional divergences—one default, one retry count, and one missing-versus-null difference. The fixture performs no network I/O.
 
 ## Help improve the semantic proof
 
-Start with the [five prepared issue seeds](docs/ISSUE_SEEDS.md): they range from focused pointer/report tests to bounded command streaming and schema design. Comment on the matching issue before coding, or contribute a synthetic edge case or clearer probe documentation. See the [contributor pathways](CONTRIBUTING.md#contributor-pathways) and [scoped roadmap](ROADMAP.md).
+Start with a [contributor-ready issue](https://github.com/Akhilesh-Gogikar/sdk-wirediff/issues?q=is%3Aissue+is%3Aopen+label%3A%22status%3A+ready%22) (design context in [ISSUE_SEEDS.md](docs/ISSUE_SEEDS.md)): they range from focused pointer/report tests to bounded command streaming and schema design. Comment on the matching issue before coding, or contribute a synthetic edge case or clearer probe documentation. See the [contributor pathways](CONTRIBUTING.md#contributor-pathways) and [scoped roadmap](ROADMAP.md).
 
 ## Install the CLI from a local checkout
 
@@ -78,7 +78,7 @@ sdk-wirediff compare demo-output/repro.json
 
 Version 0 requires exactly `typescript`, `python`, and `go` adapter slots plus a baseline. Each adapter provides one of:
 
-- `{"observation": "relative/capture.json"}` for captured JSON;
+- `{"observation": "relative/capture.json"}` for captured JSON inside the manifest directory;
 - `{"command": ["python3", "adapter.py"]}` for trusted argv whose stdout is one JSON object; or
 - `{"inline": {...}}` for self-contained repros.
 
@@ -103,14 +103,14 @@ Named RFC 6901 probes select semantics:
 }
 ```
 
-Transforms are `identity`, `length`, `keys`, `presence`, `sorted`, and `status-class`. `presence` distinguishes missing, explicit `null`, and a value without exposing the value. Header names, methods, statuses, JSON string bodies, and URL queries are normalized first. Common credential headers and secret-like query parameters are redacted; raw URLs are discarded after path/query parsing.
+Transforms are `identity`, `length`, `keys`, `presence`, `sorted`, and `status-class`. `presence` distinguishes missing, explicit `null`, and a value without exposing the value. Header names, methods, statuses, JSON string bodies, and URL queries are normalized first. Common credential headers and secret-like query parameters are redacted; the request URL is discarded after path/query parsing. Recorded attempts and `response.url` keep their shape, but credential headers, secret-like query values, and URL userinfo are replaced. Response bodies and other fields are not redacted.
 
 ## Honest boundaries
 
 - The observation envelope is a small convention, not a general traffic or telemetry standard.
 - Streaming frame timing, binary/multipart bodies, connection behavior, and concurrency are not modeled in 0.1.x.
 - Command adapters are trusted local programs. The opt-in flag prevents accidental execution but is not a process or network sandbox.
-- Input and command stdout are capped at 2 MiB after capture. Never use production credentials, customer traffic, or secrets.
+- Observation paths must resolve to a file inside the manifest directory. Input files are read at most 2 MiB; command stdout is capped at 2 MiB after capture. Never use production credentials, customer traffic, or secrets.
 - Differences are baseline-relative and probe-driven. Unprobed behavior is not evidence of equivalence.
 - Do not publish named provider failures without coordinated disclosure and independent reproduction.
 - A generic gateway, hosted recorder, or production capture agent is out of scope.
@@ -121,8 +121,8 @@ Transforms are `identity`, `length`, `keys`, `presence`, `sorted`, and `status-c
 - Operations: [troubleshooting](docs/TROUBLESHOOTING.md), [privacy](docs/PRIVACY.md), [accessibility](docs/ACCESSIBILITY.md)
 - Community: [contributing](CONTRIBUTING.md), [conduct](CODE_OF_CONDUCT.md), [support](SUPPORT.md), [governance](GOVERNANCE.md)
 - Safety: [security policy](SECURITY.md), [provenance](PROVENANCE.md), [scope](SCOPE.md)
-- Release: [changelog](CHANGELOG.md), [launch kit](docs/LAUNCH_KIT.md), [MIT license](LICENSE)
-- Contribution queue: [prepared issue seeds](docs/ISSUE_SEEDS.md)
+- Release: [changelog](CHANGELOG.md), [MIT license](LICENSE)
+- Contribution queue: [issue seeds](docs/ISSUE_SEEDS.md)
 - Related experiments: [optional ecosystem map](ECOSYSTEM.md)
 
 Security vulnerabilities should be reported through a [private security advisory](https://github.com/Akhilesh-Gogikar/sdk-wirediff/security/advisories/new), never a public issue.

@@ -4,6 +4,10 @@
 
 At least one adapter uses `command`. Review the manifest and executable first. If it is trusted and requires no production credentials, rerun with `--allow-command`. Prefer captured JSON when execution is unnecessary.
 
+## `observation must stay inside the manifest directory`
+
+Captured observations are resolved relative to the manifest and may not escape it through `..`, an absolute path, or a symlink. Copy the sanitized capture next to the manifest, or use an `inline` observation.
+
 ## The command stdout is not one JSON object
 
 Remove banners and diagnostic logging from stdout; send diagnostics to stderr. The adapter must exit zero and emit exactly one object no larger than 2 MiB.
@@ -22,6 +26,6 @@ Confirm it was produced by the same 0.1.x version and was not edited. A repro in
 
 ## Sensitive data appears in output
 
-Stop sharing the artifact and follow [SECURITY.md](../SECURITY.md). Built-in redaction covers common credential headers and secret-like query fields, not arbitrary body keys or adapter logs. Use only synthetic/sanitized captures.
+Stop sharing the artifact and follow [SECURITY.md](../SECURITY.md). Built-in redaction covers common credential headers and secret-like query fields in the request and recorded attempts, not arbitrary body keys or adapter logs. Use only synthetic/sanitized captures.
 
 Run the documented synthetic demo to distinguish an installation problem from a fixture problem. File sanitized issues under [SUPPORT.md](../SUPPORT.md).

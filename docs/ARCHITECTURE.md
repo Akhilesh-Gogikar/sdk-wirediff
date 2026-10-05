@@ -9,8 +9,8 @@ SDK WireDiff is one Python standard-library module plus a console entry point. I
 ## Components
 
 1. **Manifest loader** requires TypeScript, Python, and Go slots, one baseline, and named probe categories.
-2. **Adapter loader** accepts a relative JSON capture, inline object, or explicitly enabled argv command. Commands use no shell and must emit one bounded JSON object.
-3. **Normalizer** canonicalizes method, status, header names, JSON-like bodies, URL path/query, attempts, common error/pagination shapes, and sensitive header/query values.
+2. **Adapter loader** accepts a JSON capture that resolves inside the manifest directory, an inline object, or explicitly enabled argv command. Commands use no shell and must emit one bounded JSON object.
+3. **Normalizer** canonicalizes method, status, header names, JSON-like bodies, URL path/query, common error/pagination shapes, and sensitive header/query values in the request and each recorded attempt.
 4. **Probe engine** traverses RFC 6901 pointers and applies `identity`, `length`, `keys`, `presence`, `sorted`, or `status-class`.
 5. **Comparator** evaluates every non-baseline adapter against the baseline in a stable category/probe/language order.
 6. **Report/repro writers** escape static HTML and inline only normalized semantic values needed to replay divergent probes.
